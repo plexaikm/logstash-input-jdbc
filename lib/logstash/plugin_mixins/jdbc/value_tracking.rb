@@ -51,7 +51,7 @@ module LogStash module PluginMixins module Jdbc
       persisted = @file_handler.read
 
       if persisted && persisted.respond_to?(method_symbol)
-        @value = persisted
+        @value = persisted.send_public(method_symbol)
       else
         @file_handler.clean
         @value = default
@@ -62,12 +62,12 @@ module LogStash module PluginMixins module Jdbc
 
   class NumericValueTracker < ValueTracking
     def set_initial
-      common_set_initial(:gcd, 0)
+      common_set_initial(:to_int, 0)
     end
 
     def set_value(value)
-      return unless value.is_a?(Numeric)
-      @value = value
+      return unless value.respond_to?(:to_int)
+      @value = value.to_int
     end
   end
 
